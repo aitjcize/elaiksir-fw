@@ -48,6 +48,7 @@ AC-powered matcha mixing machine. Schematic: `matcha-bowl/schematic/matcha_machi
 - Touch: 4x TTP223 (GPIO35/32/33/25)
 - RGB LED: power MOSFET (GPIO27) + PWM (GPIO14)
 - State machine: IDLE → HEATING → MIXING → DONE
+- CLI console over UART: `heater`, `motor`, `temp`, `touch`, `rgb`, `display`, `status`
 
 ### liquid-machine (ESP32-P4)
 24V DC liquid dispensing machine. Schematic: `liquid-machine/schematic/MM32P4_V1_Schematic_0402.pdf`.
@@ -60,6 +61,7 @@ AC-powered matcha mixing machine. Schematic: `matcha-bowl/schematic/matcha_machi
 - Flow sensor: PCNT pulse counting
 - HTTP API: pump control, time-based order execution, reservoir levels, settings (NVS)
 - Dispensing is time-based (amount_ml / ml_per_second). Load cells are for inventory only.
+- CLI console over UART: `pump`, `stop-all`, `valve`, `scale`, `temp`, `flow`, `net`, `status`
 
 ## Architecture Patterns
 
@@ -86,7 +88,7 @@ When adding new peripheral abstractions, follow this pattern: define ops struct 
 Generic I2C/SPI device drivers. Stateless where possible — caller manages device instance structs. All use ESP-IDF v6.0 `i2c_master` API (not legacy i2c driver).
 
 ### Product-specific components
-Components in `<product>/components/` contain hardware-specific code that implements shared interfaces or provides product-only functionality (e.g. heater, touch, display, http_api).
+Components in `<product>/components/` contain hardware-specific code that implements shared interfaces or provides product-only functionality (e.g. heater, touch, display, http_api, cli).
 
 ## Conventions
 
