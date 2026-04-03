@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      - name: Check formatting
+        run: make format-check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cppcheck
+        run: sudo apt-get install -y cppcheck
+      - name: Run cppcheck
+        run: make lint
+
+  build-matcha:
+    name: Build matcha-bowl (ESP32)
+    runs-on: ubuntu-latest
+    container: espressif/idf:v6.0
+    needs: [format-check, lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build matcha-bowl
+        shell: bash
+        run: |
+          . $IDF_PATH/export.sh
+          cd matcha-bowl
+          idf.py set-target esp32
+          idf.py build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: matcha-bowl-firmware
+          path: |
+            matcha-bowl/build/matcha-bowl.bin
+            matcha-bowl/build/bootloader/bootloader.bin
+            matcha-bowl/build/partition_table/partition-table.bin
+          if-no-files-found: warn
+
+  build-liquid:
+    name: Build liquid-machine (ESP32-P4)
+    runs-on: ubuntu-latest
+    container: espressif/idf:v6.0
+    needs: [format-check, lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build liquid-machine
+        shell: bash
+        run: |
+          . $IDF_PATH/export.sh
+          cd liquid-machine
+          idf.py set-target esp32p4
+          idf.py build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: liquid-machine-firmware
+          path: |
+            liquid-machine/build/liquid-machine.bin
+            liquid-machine/build/bootloader/bootloader.bin
+            liquid-machine/build/partition_table/partition-table.bin
+          if-no-files-found: warn

@@ -90,9 +90,25 @@ Generic I2C/SPI device drivers. Stateless where possible — caller manages devi
 ### Product-specific components
 Components in `<product>/components/` contain hardware-specific code that implements shared interfaces or provides product-only functionality (e.g. heater, touch, display, http_api, cli).
 
+## Development
+
+```bash
+make help          # List all targets
+make format        # Auto-format with clang-format
+make format-check  # Check formatting (used in CI)
+make lint          # Static analysis with cppcheck
+make build         # Build both products
+make build-matcha  # Build matcha-bowl only
+make build-liquid  # Build liquid-machine only
+make clean         # Remove build directories
+```
+
+CI runs on GitHub Actions (`.github/workflows/ci.yml`): format check → lint → build both products using `espressif/idf:v6.0` Docker image. Build artifacts are uploaded.
+
 ## Conventions
 
 - C (not C++), ESP-IDF component structure
+- Formatting: clang-format with `.clang-format` config (Linux brace style, 4-space indent, 100 col)
 - GPIO pins defined as `BOARD_HAL_*_PIN` macros in `board_hal.h`
 - Logging: `ESP_LOGI(TAG, ...)` with `static const char *TAG = "component_name"`
 - Error handling: return `esp_err_t`, check with `ESP_ERROR_CHECK()` at init
