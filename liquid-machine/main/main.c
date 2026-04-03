@@ -20,6 +20,7 @@
 #include "ads1115.h"
 #include "tca9555.h"
 #include "http_api.h"
+#include "cli.h"
 
 static const char *TAG = "liquid";
 
@@ -267,6 +268,20 @@ void app_main(void)
 
     /* Start control loop */
     xTaskCreate(control_loop_task, "ctrl_loop", 8192, NULL, 10, NULL);
+
+    /* Start CLI console */
+    cli_config_t cli_cfg = {
+        .motors = motors,
+        .num_motors = BOARD_HAL_NUM_MOTORS,
+        .temp_sensors = temp_sensors,
+        .num_temp_sensors = BOARD_HAL_NUM_TEMP_SENSORS,
+        .scales = scales,
+        .num_scales = BOARD_HAL_NUM_LOAD_CELLS,
+        .valves = valves,
+        .num_valves = BOARD_HAL_NUM_SOLENOIDS,
+        .flow = &flow,
+    };
+    ESP_ERROR_CHECK(cli_init(&cli_cfg));
 
     ESP_LOGI(TAG, "Liquid Machine ready: %d motors, %d valves, %d scales, %d temp sensors",
              BOARD_HAL_NUM_MOTORS, BOARD_HAL_NUM_SOLENOIDS,

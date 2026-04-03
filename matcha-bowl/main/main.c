@@ -14,6 +14,7 @@
 #include "touch.h"
 #include "rgb_led.h"
 #include "display.h"
+#include "cli.h"
 
 static const char *TAG = "matcha";
 
@@ -222,6 +223,14 @@ void app_main(void)
     enter_state(STATE_IDLE);
 
     xTaskCreate(control_loop_task, "ctrl_loop", 4096, NULL, 10, NULL);
+
+    /* Start CLI console */
+    cli_config_t cli_cfg = {
+        .heater = heater,
+        .motor = whisk_motor,
+        .temp_sensor = water_temp,
+    };
+    ESP_ERROR_CHECK(cli_init(&cli_cfg));
 
     ESP_LOGI(TAG, "Matcha Machine ready");
 }
